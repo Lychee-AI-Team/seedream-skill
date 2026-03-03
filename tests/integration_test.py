@@ -39,6 +39,32 @@ class IntegrationTest:
         print("火山引擎API Skill 集成测试")
         print("=" * 60)
         
+        try:
+            # Use ConfigManager which supports both env var and config file
+            self.config = ConfigManager()
+            api_key = self.config.get_api_key()
+            
+            if not api_key:
+                print("❌ 错误: 未配置 API Key")
+                print("请通过以下方式之一配置:")
+                print("  1. 环境变量: export ARK_API_KEY='your-api-key'")
+                print("  2. 配置文件: ~/.volcengine/config.yaml")
+                return False
+            
+            print(f"✓ API Key 已配置 (长度: {len(api_key)})")
+            
+            self.client = VolcengineAPIClient(self.config)
+            self.task_manager = TaskManager(self.client)
+            print("✓ 客户端初始化成功")
+            return True
+        except Exception as e:
+            print(f"❌ 初始化失败: {e}")
+            return False
+        """Setup test environment."""
+        print("=" * 60)
+        print("火山引擎API Skill 集成测试")
+        print("=" * 60)
+        
         # Check API key
         api_key = os.getenv("ARK_API_KEY")
         if not api_key:
@@ -160,9 +186,46 @@ class IntegrationTest:
             return
         
         try:
-            # Real API call would go here
-            print("    实际API调用需要正确的endpoint配置")
-            self.record_result("Image: 生成图像", False, "需要配置正确的API endpoint")
+            import httpx
+            
+            # 火山引擎图像生成API
+            url = "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+            
+            payload = {
+                "model": "doubao-seedream-4-0-250828",
+                "prompt": "一只可爱的橘猫在阳光下睡觉",
+                "size": "1024x1024",
+                "response_format": "url"
+            }
+            
+            headers = {
+                "Authorization": f"Bearer {self.config.get_api_key()}",
+                "Content-Type": "application/json"
+            }
+            
+            print(f"    请求URL: {url}")
+            print(f"    模型: {payload['model']}")
+            print(f"    提示词: {payload['prompt']}")
+            
+            with httpx.Client(timeout=180.0) as client:
+                response = client.post(url, json=payload, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    # 检查响应结构
+                    if "data" in result and len(result["data"]) > 0:
+                        image_url = result["data"][0].get("url", "")
+                        self.record_result(
+                            "Image: 生成图像", 
+                            True, 
+                            f"图像URL: {image_url[:50]}..." if len(image_url) > 50 else f"图像URL: {image_url}"
+                        )
+                    else:
+                        self.record_result("Image: 生成图像", True, f"响应: {result}")
+                else:
+                    error_text = response.text[:200]
+                    self.record_result("Image: 生成图像", False, f"HTTP {response.status_code}: {error_text}")
+                    
         except Exception as e:
             self.record_result("Image: 生成图像", False, str(e))
     
