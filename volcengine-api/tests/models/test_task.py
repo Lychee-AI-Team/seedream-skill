@@ -161,7 +161,7 @@ class TestTaskInfo:
         now = datetime.now()
         
         for task_type in [TaskType.IMAGE_GENERATION, TaskType.VIDEO_T2V, 
-                          TaskType.AUDIO_TTS, TaskType.VISION_DETECTION]:
+                          TaskType.VISION_DETECTION]:
             task = TaskInfo(
                 id=f"task-{task_type.value}",
                 type=task_type,
@@ -171,7 +171,6 @@ class TestTaskInfo:
                 updated_at=now
             )
             assert task.type == task_type
-    
     def test_task_info_different_statuses(self):
         """Test TaskInfo with different task statuses."""
         now = datetime.now()

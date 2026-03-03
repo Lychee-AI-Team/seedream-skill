@@ -28,7 +28,6 @@ class TaskType(str, Enum):
     VIDEO_I2V = "video_i2v"
     VIDEO_FRAMES = "video_frames"
     VIDEO_REFERENCES = "video_references"
-    AUDIO_TTS = "audio_tts"
     VISION_DETECTION = "vision_detection"
 
 

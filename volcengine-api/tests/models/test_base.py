@@ -42,12 +42,11 @@ class TestTaskType:
         assert TaskType.VIDEO_I2V == "video_i2v"
         assert TaskType.VIDEO_FRAMES == "video_frames"
         assert TaskType.VIDEO_REFERENCES == "video_references"
-        assert TaskType.AUDIO_TTS == "audio_tts"
         assert TaskType.VISION_DETECTION == "vision_detection"
     
     def test_task_type_count(self):
-        """Test that TaskType has exactly 8 values."""
-        assert len(TaskType) == 8
+        """Test that TaskType has exactly 7 values."""
+        assert len(TaskType) == 7
     
     def test_task_type_is_string_enum(self):
         """Test that TaskType is a string enum."""

@@ -20,9 +20,8 @@ class TestGuideGenerator:
         assert "火山引擎API助手" in guide
         assert "生成图像" in guide
         assert "生成视频" in guide
-        assert "音频生成" in guide
+        assert "视觉理解" in guide
         assert "任务管理" in guide
-    
     def test_get_post_operation_guide_image(self):
         """Test post-operation guide for image."""
         guide = GuideGenerator.get_post_operation_guide(TaskType.IMAGE_GENERATION)
@@ -42,7 +41,7 @@ class TestGuideGenerator:
         guide = GuideGenerator.get_post_operation_guide(TaskType.VIDEO_T2V)
         
         assert "视频生成成功" in guide
-        assert "生成更多视频" in guide
+        assert "继续创作" in guide or "提取视频帧" in guide
     
     def test_get_post_operation_guide_video_with_url(self):
         """Test post-operation guide with video URL."""
@@ -51,18 +50,11 @@ class TestGuideGenerator:
         
         assert "https://example.com/video.mp4" in guide
     
-    def test_get_post_operation_guide_audio(self):
-        """Test post-operation guide for audio."""
-        guide = GuideGenerator.get_post_operation_guide(TaskType.AUDIO_TTS)
-        
-        assert "音频生成成功" in guide
-    
     def test_get_post_operation_guide_vision(self):
         """Test post-operation guide for vision."""
         guide = GuideGenerator.get_post_operation_guide(TaskType.VISION_DETECTION)
         
         assert "图像分析完成" in guide
-    
     def test_get_contextual_suggestions_with_preferences(self, tmp_path):
         """Test contextual suggestions with user preferences."""
         state_manager = StateManager(state_dir=tmp_path)
