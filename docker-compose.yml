@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  volcengine-skill:
+    build:
+      context: .
+    environment:
+      ARK_API_KEY: ${ARK_API_KEY}
+    volumes:
+      - ./output:/app/output
+      # Optional local config mount:
+      # - ${HOME}/.volcengine:/root/.volcengine:ro
+    restart: unless-stopped
