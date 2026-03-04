@@ -19,7 +19,8 @@ This guide helps you run the project in 30 seconds, then covers a complete 5-min
 Use this when you want a fast smoke test.
 
 ```bash
-cd /Users/mastercui.eth/GitHub/ai-agent-cli/.worktrees/volcengine-api
+git clone https://github.com/Lychee-AI-Team/Volcengine-Skill.git
+cd Volcengine-Skill
 bash install.sh
 export ARK_API_KEY="your-real-api-key"
 python examples/quickstart.py
@@ -43,7 +44,8 @@ This path is for users who want stable local setup plus verification.
 4. Run installation checks and API connectivity checks.
 
 ```bash
-cd /Users/mastercui.eth/GitHub/ai-agent-cli/.worktrees/volcengine-api
+git clone https://github.com/Lychee-AI-Team/Volcengine-Skill.git
+cd Volcengine-Skill
 bash install.sh
 bash scripts/configure.sh
 bash scripts/verify_install.sh
@@ -68,7 +70,7 @@ Requirements:
 Complete installation flow:
 
 ```bash
-cd /Users/mastercui.eth/GitHub/ai-agent-cli/.worktrees/volcengine-api
+cd Volcengine-Skill
 python3 -m pip install --upgrade pip
 python3 -m pip install -r volcengine-api/requirements.txt
 mkdir -p output

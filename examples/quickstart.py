@@ -18,10 +18,10 @@ from pathlib import Path
 from typing import Any
 
 
-# Add project root (one level above `examples/`) to import `toolkit` modules.
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+TOOLKIT_ROOT = PROJECT_ROOT / "volcengine-api"
+if str(TOOLKIT_ROOT) not in sys.path:
+    sys.path.insert(0, str(TOOLKIT_ROOT))
 
 from toolkit.api_client import VolcengineAPIClient  # noqa: E402
 from toolkit.config import ConfigManager  # noqa: E402
