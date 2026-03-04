@@ -1,0 +1,152 @@
+# Volcengine API Skill Metadata
+# 用于 ClawHub/OpenClaw 平台的技能元数据声明
+
+name: doubao-seedream-seedance-skill
+version: 1.0.0
+description: |
+  火山引擎 API Skill - 提供图像生成、视频生成和视觉理解功能
+  Doubao Seedream & Seedance API Skill for image/video generation and vision understanding
+
+author: AI-Lychee
+license: MIT
+repository: https://github.com/Lychee-AI-Team/seedream-skill
+
+# ===========================================
+# 必需的环境变量声明
+# Required Environment Variables
+# ===========================================
+required_env_vars:
+  - name: ARK_API_KEY
+    description: |
+      火山引擎 API 密钥 (必需)
+      Volcengine API Key (Required)
+      获取方式: https://console.volcengine.com/ark
+    required: true
+    sensitive: true
+
+# ===========================================
+# 可选的环境变量声明
+# Optional Environment Variables
+# ===========================================
+optional_env_vars:
+  - name: VOLCENGINE_BASE_URL
+    description: API 基础 URL
+    default: "https://ark.cn-beijing.volces.com/api/v3"
+    
+  - name: VOLCENGINE_OUTPUT_DIR
+    description: 输出文件保存目录
+    default: "./output"
+    
+  - name: VOLCENGINE_TIMEOUT
+    description: 请求超时时间 (秒)
+    default: "30"
+    
+  - name: VOLCENGINE_MAX_RETRIES
+    description: 最大重试次数
+    default: "3"
+
+# ===========================================
+# 文件持久化声明
+# File Persistence Declaration
+# ===========================================
+persists_to:
+  - path: ~/.volcengine/
+    description: |
+      全局配置和任务历史目录
+      Global config, task history, and state storage
+    contains:
+      - config.yaml (可能包含 API 密钥)
+      - tasks/ (任务历史)
+      - state/ (状态文件)
+    security_note: |
+      建议设置目录权限: chmod 700 ~/.volcengine
+      如存储 API 密钥，建议设置: chmod 600 ~/.volcengine/config.yaml
+      
+  - path: ./.volcengine/
+    description: |
+      项目级配置目录
+      Project-level configuration
+    contains:
+      - config.yaml (项目配置)
+    security_note: |
+      此目录已添加到 .gitignore，不会被提交到版本控制
+      建议不要在项目配置文件中存储长期有效的 API 密钥
+
+# ===========================================
+# 安全声明
+# Security Declaration
+# ===========================================
+security:
+  # 需要凭证
+  credentials_required: true
+  credential_type: api_key
+  
+  # 网络访问
+  network_access: true
+  endpoints:
+    - "https://ark.cn-beijing.volces.com/api/v3"
+    - "https://ark.cn-beijing.volces.com/api/v3/*"
+  
+  # 文件系统访问
+  file_system_access: true
+  file_operations:
+    - read (配置文件)
+    - write (配置文件、输出文件、任务状态)
+  
+  # 安全建议
+  recommendations:
+    - 使用具有最小权限和计费限制的 API 密钥
+    - 优先使用环境变量而非配置文件存储密钥
+    - 定期轮换 API 密钥
+    - 不要将 .volcengine/ 目录提交到版本控制
+    - 在生产环境中使用短期或范围受限的凭证
+
+# ===========================================
+# 功能声明
+# Capabilities Declaration
+# ===========================================
+capabilities:
+  - name: image_generation
+    description: 图像生成 (Seedream 4.0)
+    models:
+      - doubao-seedream-4-0-250828
+      
+  - name: video_generation
+    description: 视频生成 (Seedance 1.5)
+    models:
+      - doubao-seedance-1-5-pro-251215
+      
+  - name: vision_understanding
+    description: 视觉理解
+    models:
+      - doubao-seed-1-6-vision-250815
+      
+  - name: task_management
+    description: 任务管理 (创建、查询、下载)
+
+# ===========================================
+# 依赖声明
+# Dependencies Declaration
+# ===========================================
+dependencies:
+  runtime:
+    - volcengine-python-sdk[ark]>=5.0.0
+    - httpx>=0.27.0
+    - PyYAML>=6.0
+    - Pydantic>=2.0.0
+    - Pillow>=10.0.0
+    
+  optional:
+    - pytest>=7.4.0 (测试)
+    - pytest-cov>=4.1.0 (覆盖率)
+
+# ===========================================
+# 兼容性声明
+# Compatibility Declaration
+# ===========================================
+compatibility:
+  python: ">=3.9"
+  platforms:
+    - Linux
+    - macOS
+    - Windows (WSL2)

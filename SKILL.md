@@ -45,7 +45,7 @@ pip install -r volcengine-api/requirements.txt
 ### 配置
 
 ```bash
-# 方式一：环境变量（推荐）
+# 方式一：环境变量（推荐 ✅ 最安全）
 export ARK_API_KEY="your-api-key"
 
 # 方式二：交互式配置
@@ -54,12 +54,105 @@ export ARK_API_KEY="your-api-key"
 # 方式三：配置文件
 mkdir -p ~/.volcengine
 echo 'api_key: "your-api-key"' > ~/.volcengine/config.yaml
+chmod 600 ~/.volcengine/config.yaml  # 重要：设置安全权限
 ```
 
 ### 验证
 
 ```bash
 ./scripts/verify_install.sh
+```
+
+---
+
+## 🔒 安全最佳实践
+
+> ⚠️ **重要**: API Key 是敏感凭证，请遵循以下安全实践。
+
+### 1. 推荐的密钥管理方式
+
+| 方式 | 安全性 | 推荐场景 |
+|------|--------|----------|
+| 环境变量 | ⭐⭐⭐⭐⭐ | **推荐** - 所有场景 |
+| 密钥管理服务 | ⭐⭐⭐⭐⭐ | 生产环境 |
+| 配置文件 (带权限) | ⭐⭐⭐ | 本地开发 |
+
+### 2. 环境变量配置（推荐）
+
+```bash
+# 临时设置（当前会话）
+export ARK_API_KEY="your-api-key"
+
+# 永久设置（添加到 shell 配置）
+echo 'export ARK_API_KEY="your-api-key"' >> ~/.bashrc
+source ~/.bashrc
+
+# 验证设置
+echo $ARK_API_KEY | head -c 4  # 应显示前4个字符
+```
+
+### 3. 配置文件安全
+
+如果必须使用配置文件存储 API Key：
+
+```bash
+# 创建配置目录
+mkdir -p ~/.volcengine
+
+# 创建配置文件
+cat > ~/.volcengine/config.yaml << 'EOF'
+api_key: "your-api-key"
+base_url: "https://ark.cn-beijing.volces.com/api/v3"
+EOF
+
+# 设置安全权限（关键！）
+chmod 700 ~/.volcengine          # 目录：仅所有者可访问
+chmod 600 ~/.volcengine/config.yaml  # 文件：仅所有者可读写
+```
+
+### 4. 文件权限验证
+
+```bash
+# 检查目录权限（应为 drwx------ 或 700）
+ls -la ~ | grep .volcengine
+
+# 检查文件权限（应为 -rw------- 或 600）
+ls -la ~/.volcengine/config.yaml
+```
+
+### 5. 禁止事项
+
+| 禁止 | 原因 |
+|------|------|
+| ❌ 将 API Key 提交到 Git | 会被公开访问 |
+| ❌ 在日志中打印 API Key | 可能泄露 |
+| ❌ 在 URL 中传递 API Key | 会被记录 |
+| ❌ 硬编码 API Key | 难以轮换 |
+| ❌ 共享 API Key | 无法追踪责任 |
+
+### 6. .gitignore 配置
+
+确保 `.gitignore` 包含以下内容：
+
+```gitignore
+# Volcengine config (may contain API keys)
+.volcengine/
+*.volcengine/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+```
+
+### 7. 密钥轮换建议
+
+```bash
+# 定期更换 API Key（建议每90天）
+# 1. 在火山引擎控制台生成新密钥
+# 2. 更新环境变量或配置文件
+# 3. 验证新密钥工作正常
+# 4. 在控制台删除旧密钥
 ```
 
 ---
@@ -145,8 +238,11 @@ echo 'api_key: "your-api-key"' > ~/.volcengine/config.yaml
 
 | 变量 | 说明 | 必需 |
 |------|------|------|
-| `ARK_API_KEY` | 火山引擎API密钥 | 是 |
+| `ARK_API_KEY` | 火山引擎API密钥 | **是** |
+| `VOLCENGINE_BASE_URL` | API基础URL | 否 |
 | `VOLCENGINE_OUTPUT_DIR` | 输出目录 | 否 |
+| `VOLCENGINE_TIMEOUT` | 请求超时(秒) | 否 |
+| `VOLCENGINE_MAX_RETRIES` | 最大重试次数 | 否 |
 
 ### 配置文件
 
@@ -155,7 +251,7 @@ echo 'api_key: "your-api-key"' > ~/.volcengine/config.yaml
 **全局配置**: `~/.volcengine/config.yaml`
 
 ```yaml
-api_key: "your-api-key"
+# api_key: "your-api-key"  # 推荐使用环境变量
 base_url: "https://ark.cn-beijing.volces.com/api/v3"
 timeout: 30
 max_retries: 3
@@ -164,9 +260,10 @@ output_dir: "./output"
 
 ### 配置优先级
 
-1. 环境变量 `ARK_API_KEY`
-2. 配置文件 `~/.volcengine/config.yaml`
-3. 代码中直接设置（不推荐）
+1. 环境变量 `ARK_API_KEY` （**推荐**）
+2. 项目配置 `.volcengine/config.yaml`
+3. 全局配置 `~/.volcengine/config.yaml`
+4. 默认值
 
 ---
 
@@ -187,6 +284,25 @@ output_dir: "./output"
 3. **视频时长** - 限制在1-10秒
 4. **异步任务** - 所有生成任务都是异步的，可以查看进度
 5. **速率限制** - 注意API调用频率，避免触发限制
+6. **数据持久化** - 任务状态和历史保存在 `~/.volcengine/` 目录
+
+---
+
+## 数据持久化说明
+
+本 Skill 会在以下位置存储数据：
+
+| 路径 | 内容 | 敏感性 |
+|------|------|--------|
+| `~/.volcengine/config.yaml` | 全局配置（可能含API Key） | ⚠️ 敏感 |
+| `~/.volcengine/tasks/` | 任务历史 | 普通 |
+| `~/.volcengine/state/` | 状态文件 | 普通 |
+| `./.volcengine/config.yaml` | 项目配置（可能含API Key） | ⚠️ 敏感 |
+
+**安全建议**:
+- 确保配置文件权限为 600
+- 不要将 `.volcengine/` 目录提交到版本控制
+- 定期清理不需要的历史数据
 
 ---
 

@@ -4,6 +4,10 @@
 # Sisyphus task management
 .sisyphus/
 
+# Volcengine config (may contain API keys)
+.volcengine/
+*.volcengine/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -49,9 +53,21 @@ htmlcov/
 output/
 *.png
 *.jpg
+*.jpeg
+*.gif
 *.mp4
 *.mp3
+*.wav
 
-# Environment
+# Environment files
 .env
 .env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
