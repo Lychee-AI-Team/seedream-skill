@@ -38,50 +38,63 @@ def _require_api_key() -> str:
 
 
 def image_generation_example(client: VolcengineAPIClient) -> dict[str, Any]:
-    """Run a text-to-image request using Seedream 4.0 model."""
+    """Run a text-to-image request using Seedream 4.0 model.
+    
+    Note: Image generation API uses /images/generations endpoint (plural)
+    and supports various parameters like size, watermark, etc.
+    """
     payload = {
         "model": "doubao-seedream-4-0-250828",
         "prompt": "A cinematic sunset over a quiet coastal town, warm tones, ultra detailed",
         "size": "1024x1024",
+        "response_format": "url",
         "n": 1,
     }
-    return client.post("/images/generate", json=payload)
+    return client.post("/images/generations", json=payload)
 
 
 def video_generation_example(client: VolcengineAPIClient) -> dict[str, Any]:
-    """Run a text-to-video request using Seedance 1.5 Pro model."""
+    """Run a text-to-video request using Seedance 1.5 Pro model.
+    
+    Note: Video generation API uses /contents/generations/tasks endpoint
+    and requires content array format with text commands for parameters.
+    """
     payload = {
         "model": "doubao-seedance-1-5-pro-251215",
-        "prompt": "A drone shot flying forward through a bamboo forest at dawn, smooth camera motion",
-        "duration": 5,
-        "resolution": "720p",
+        "content": [
+            {
+                "type": "text",
+                "text": "A drone shot flying forward through a bamboo forest at dawn, smooth camera motion --duration 5 --resolution 720p"
+            }
+        ],
     }
-    return client.post("/videos/generate", json=payload)
-
+    return client.post("/contents/generations/tasks", json=payload)
 
 def vision_understanding_example(client: VolcengineAPIClient) -> dict[str, Any]:
-    """Run a multimodal understanding request using Seed 1.6 Vision model."""
+    """Run a multimodal understanding request using Seed 1.6 Vision model.
+    
+    Note: Vision understanding uses /responses endpoint (not /chat/completions)
+    and requires 'input' array format with content objects.
+    """
     payload = {
         "model": "doubao-seed-1-6-vision-250815",
-        "messages": [
+        "input": [
             {
                 "role": "user",
                 "content": [
                     {
-                        "type": "text",
+                        "type": "input_text",
                         "text": "Describe the image in detail and list the key objects.",
                     },
                     {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": "https://images.unsplash.com/photo-1501785888041-af3ef285b470"
-                        },
+                        "type": "input_image",
+                        "image_url": "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
                     },
                 ],
             }
         ],
     }
-    return client.post("/chat/completions", json=payload)
+    return client.post("/responses", json=payload)
 
 
 def main() -> int:

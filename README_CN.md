@@ -145,7 +145,7 @@ config.set("api_key", "your-api-key")
 # 创建客户端
 with VolcengineAPIClient(config) as client:
     # 生成图像
-    result = client.post("/images/generate", json={
+    result = client.post("/images/generations", json={
         "prompt": "夕阳下的海滩，有椰子树和海浪",
         "width": 1024,
         "height": 768
@@ -156,12 +156,19 @@ with VolcengineAPIClient(config) as client:
 ### 视频生成
 
 ```python
-# 生成视频
-result = client.post("/videos/generate", json={
-    "prompt": "镜头缓缓拉出，展现山景",
-    "duration": 5.0
+# 生成视频（异步任务）
+result = client.post("/contents/generations/tasks", json={
+    "model": "doubao-seedance-1-5-pro-251215",
+    "content": [
+        {
+            "type": "text",
+            "text": "镜头缓缓拉出，展现山景 --duration 5"
+        }
+    ]
 })
-print(f"视频URL: {result['url']}")
+# 注意：视频生成是异步的。使用任务ID查询状态：
+# task_result = client.get(f"/contents/generations/tasks/{result['id']}")
+print(f"任务ID: {result['id']}")
 ```
 
 ### 基础用法
@@ -320,7 +327,7 @@ from toolkit.error_handler import (
 )
 
 try:
-    result = client.post("/images/generate", json=params)
+    result = client.post("/images/generations", json=params)
 except AuthenticationError as e:
     print(f"认证失败: {e.message}")
     print(f"解决方案: {e.solution}")

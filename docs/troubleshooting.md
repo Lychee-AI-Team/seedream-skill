@@ -49,7 +49,7 @@ config = RetryConfig(
 
 @retry_with_backoff(config)
 def api_call_with_retry():
-    return client.post("/images/generate", json=params)
+    return client.post("/images/generations", json=params)
 ```
 
 ---
@@ -265,7 +265,7 @@ async def batch_generate(prompts):
     
     async def generate(prompt):
         async with VolcengineAPIClient(config) as client:
-            return await client.post("/images/generate", json={"prompt": prompt})
+            return await client.post("/images/generations", json={"prompt": prompt})
     
     tasks = [generate(p) for p in prompts]
     results = await asyncio.gather(*tasks)

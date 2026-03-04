@@ -145,7 +145,7 @@ config.set("api_key", "your-api-key")
 # Create client
 with VolcengineAPIClient(config) as client:
     # Generate image
-    result = client.post("/images/generate", json={
+    result = client.post("/images/generations", json={
         "prompt": "Sunset beach with palm trees and waves",
         "width": 1024,
         "height": 768
@@ -156,12 +156,19 @@ with VolcengineAPIClient(config) as client:
 ### Video Generation
 
 ```python
-# Generate video
-result = client.post("/videos/generate", json={
-    "prompt": "Camera slowly pulls out, revealing mountain scenery",
-    "duration": 5.0
+# Generate video (async task)
+result = client.post("/contents/generations/tasks", json={
+    "model": "doubao-seedance-1-5-pro-251215",
+    "content": [
+        {
+            "type": "text",
+            "text": "Camera slowly pulls out, revealing mountain scenery --duration 5"
+        }
+    ]
 })
-print(f"Video URL: {result['url']}")
+# Note: Video generation is async. Use task ID to query status:
+# task_result = client.get(f"/contents/generations/tasks/{result['id']}")
+print(f"Task ID: {result['id']}")
 ```
 
 ### Basic Usage
@@ -320,7 +327,7 @@ from toolkit.error_handler import (
 )
 
 try:
-    result = client.post("/images/generate", json=params)
+    result = client.post("/images/generations", json=params)
 except AuthenticationError as e:
     print(f"Authentication failed: {e.message}")
     print(f"Solution: {e.solution}")

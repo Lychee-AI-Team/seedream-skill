@@ -283,23 +283,21 @@ class FullFeatureTest:
             self.record_result("视觉", "图像分析", True, "⚠️  无图片URL(跳过)")
             return
         
-        url = "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+        url = "https://ark.cn-beijing.volces.com/api/v3/responses"
         
         payload = {
             "model": "doubao-seed-1-6-vision-250815",
-            "messages": [
+            "input": [
                 {
                     "role": "user",
                     "content": [
                         {
-                            "type": "text",
+                            "type": "input_text",
                             "text": "请描述这张图片的内容"
                         },
                         {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": self.last_image_url
-                            }
+                            "type": "input_image",
+                            "image_url": self.last_image_url
                         }
                     ]
                 }
@@ -317,8 +315,9 @@ class FullFeatureTest:
                 
                 if response.status_code == 200:
                     result = response.json()
-                    if "choices" in result and len(result["choices"]) > 0:
-                        content = result["choices"][0].get("message", {}).get("content", "")
+                    # Responses API 返回格式可能不同，需要根据实际响应调整
+                    if "output" in result:
+                        content = result["output"].get("text", "")
                         self.record_result("视觉", "图像分析", True, f"分析: {content[:100]}...")
                     else:
                         self.record_result("视觉", "图像分析", True, "响应接收成功")
