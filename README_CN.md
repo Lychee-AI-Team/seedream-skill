@@ -267,6 +267,22 @@ pytest volcengine-api/tests/test_api_client.py -v
 pytest volcengine-api/tests/ --cov=toolkit --cov-report=html
 ```
 
+### 标准化端到端冒烟测试
+
+```bash
+python scripts/smoke_e2e.py
+```
+
+可选参数：
+
+```bash
+python scripts/smoke_e2e.py \
+  --image-prompt "赛博朋克风格的城市夜景" \
+  --video-prompt "镜头向上升，天空中飞行汽车呼啸而过" \
+  --poll-interval 5 \
+  --max-polls 24
+```
+
 ---
 
 ## 📚 API参考

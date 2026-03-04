@@ -267,6 +267,22 @@ pytest volcengine-api/tests/test_api_client.py -v
 pytest volcengine-api/tests/ --cov=toolkit --cov-report=html
 ```
 
+### Standardized End-to-End Smoke Test
+
+```bash
+python scripts/smoke_e2e.py
+```
+
+Optional parameters:
+
+```bash
+python scripts/smoke_e2e.py \
+  --image-prompt "Cyberpunk city at night" \
+  --video-prompt "Camera rises as flying cars streak by" \
+  --poll-interval 5 \
+  --max-polls 24
+```
+
 ---
 
 ## 📚 API Reference
